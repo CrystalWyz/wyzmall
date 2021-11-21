@@ -19,5 +19,6 @@
         <module>wyzmall-order</module>
         <module>wyzmall-product</module>
         <module>wyzmall-ware</module>
+        <module>renren-fast</module>
     </modules>
 </project>
