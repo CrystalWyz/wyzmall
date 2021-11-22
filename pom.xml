@@ -20,5 +20,7 @@
         <module>wyzmall-product</module>
         <module>wyzmall-ware</module>
         <module>renren-fast</module>
+        <module>renren-generator</module>
+        <module>wyzmall-common</module>
     </modules>
 </project>
