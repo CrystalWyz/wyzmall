@@ -3,6 +3,7 @@ package cn.wyz.wyzmall.member.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import cn.wyz.wyzmall.member.feign.CouponFeignService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +30,18 @@ import cn.wyz.common.utils.R;
 public class MemberController {
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private CouponFeignService couponFeignService;
+
+    @RequestMapping("/openfign_test")
+    public R openFeignTest() {
+        MemberEntity memberEntity = new MemberEntity();
+        memberEntity.setNickname("wyzZzz");
+
+        R memberCoupons = couponFeignService.memberCoupons();
+        return R.ok().put("member", memberEntity).put("coupons", memberCoupons.get("coupons"));
+    }
 
     /**
      * 列表
