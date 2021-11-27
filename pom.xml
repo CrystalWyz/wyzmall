@@ -22,5 +22,6 @@
         <module>renren-fast</module>
         <module>renren-generator</module>
         <module>wyzmall-common</module>
+        <module>wyzmall-gateway</module>
     </modules>
 </project>
