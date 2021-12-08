@@ -1,11 +1,11 @@
 spring:
   application:
-    name: wyzmall-gateway
+    name: wyzmall-coupon
   cloud:
     nacos:
       config:
-        namespace: c4190e68-3c29-4198-8a26-c08a3e6b81aa
         server-addr: 192.168.85.1:8848
+        namespace: renren-fast
         group: dev
         file-extension: yml
 
