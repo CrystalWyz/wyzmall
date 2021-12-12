@@ -6,6 +6,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
+import java.util.ArrayList;
+
 /**
  * @author wnx
  */
@@ -14,20 +16,18 @@ public class WyzmallCorsConfiguration {
 
     @Bean
     public CorsWebFilter corsWebFilter() {
-
-        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
-
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        // 跨域请求头
+        //跨域请求头
         corsConfiguration.addAllowedHeader("*");
-        // 请求来源
-        corsConfiguration.addAllowedOriginPattern("http://localhost:8001/");
-        // 请求方式
+        //跨域请求方法
         corsConfiguration.addAllowedMethod("*");
-        // 跨域cookie
+        //跨域请求源
+        corsConfiguration.addAllowedOriginPattern("*");
+        //跨域能否携带cookie
         corsConfiguration.setAllowCredentials(true);
-
-        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
-        return new CorsWebFilter(urlBasedCorsConfigurationSource);
+        source.registerCorsConfiguration("/**", corsConfiguration);
+        //跨域过滤器
+        return new CorsWebFilter(source);
     }
 }

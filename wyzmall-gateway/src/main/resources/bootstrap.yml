@@ -8,4 +8,3 @@ spring:
         server-addr: 192.168.85.1:8848
         group: dev
         file-extension: yml
-
