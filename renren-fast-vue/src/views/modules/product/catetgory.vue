@@ -1,7 +1,12 @@
 <template>
   <div>
+    <el-switch
+      v-model="draggable"
+      active-text="开启拖拽"
+      inactive-text="关闭拖拽">
+    </el-switch>
     <el-tree :data="menus" :props="defaultProps" :expand-on-click-node="false" show-checkbox node-key="catId"
-             :default-expanded-keys="expandedKey">
+             :default-expanded-keys="expandedKey" :draggable="draggable" @allow-drop="allowDrop" @node-drop="handleDrop">
     <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
         <span>
@@ -59,10 +64,13 @@ export default {
   data () {
     return {
       category: {name: '', parentCid: 0, catLevel: 0, showStatus: 1, sort: 0, catId: 0, icon: '', productUnit: ''},
+      maxLevel: 1,
       title: '',
       dialogType: '',
       dialogVisible: false,
+      draggable: true,
       expandedKey: [],
+      updateNodes: [],
       menus: [],
       defaultProps: {
         children: 'children',
@@ -182,6 +190,86 @@ export default {
         this.getMenu()
         this.expandedKey = [this.category.parentCid]
       })
+    },
+
+    allowDrop (draggingNode, dropNode, type) {
+      this.countNodeLevel(draggingNode)
+      let depth = Math.abs(this.maxLevel - draggingNode.level) + 1
+      if (type === 'inner') {
+        return depth + dropNode.level <= 3
+      } else {
+        return depth + dropNode.parent.level <= 3
+      }
+    },
+
+    countNodeLevel (draggingNode) {
+      if (draggingNode.childNodes != null && draggingNode.childNodes.length > 0) {
+        for (let i = 0; i < draggingNode.childNodes.length; i++) {
+          if (draggingNode.childNodes[i].level > this.maxLevel) {
+            this.maxLevel = draggingNode.childNodes[i].level
+          }
+          this.countNodeLevel(draggingNode.childNodes[i])
+        }
+      } else {
+        this.maxLevel = draggingNode.catLevel
+      }
+    },
+
+    handleDrop (draggingNode, dropNode, dropType, ev) {
+      let parentId = 0
+      let siblings = null
+      if (dropType === 'inner') {
+        parentId = dropNode.data.catId
+        siblings = dropNode.childNodes
+      } else {
+        parentId = dropNode.parent.data.catId === undefined ? 0 : dropNode.parent.data.catId
+        siblings = dropNode.parent.childNodes
+      }
+
+      for (let i = 0; i < siblings.length; i++) {
+        if (siblings[i].data.catId === draggingNode.data.catId) {
+          let catLevel = draggingNode.level
+          // 层级变化
+          if (siblings[i].level !== draggingNode.level) {
+            catLevel = draggingNode.level
+
+            this.updateChildNodeLevel(siblings[i])
+          }
+
+          // 处理拖拽节点
+          this.updateNodes.push({catId: siblings[i].data.catId, sort: i, parentCid: parentId, catLevel: catLevel})
+        } else {
+          this.updateNodes.push({catId: siblings[i].data.catId, sort: i})
+        }
+      }
+      // 发送请求
+      this.$http({
+        url: this.$http.adornUrl('/product/category/update/menu'),
+        method: 'post',
+        data: this.$http.adornData(this.updateNodes, false)
+      }).then(({data}) => {
+        this.$message({
+          message: '修改成功',
+          type: 'success'
+        })
+      })
+
+      // 刷新菜单
+      this.getMenu()
+      this.expandedKey = [parentId]
+
+      // 重置
+      this.maxLevel = 0
+      this.updateNodes = []
+    },
+
+    updateChildNodeLevel (child) {
+      if (child.childNodes.length > 0) {
+        for (let i = 0; i < child.childNodes.length; i++) {
+          this.updateNodes.push({catId: child.childNodes[i].data.catId, catLevel: child.childNodes[i].level})
+          this.updateChildNodeLevel(child.childNodes[i])
+        }
+      }
     }
   },
   activated () {

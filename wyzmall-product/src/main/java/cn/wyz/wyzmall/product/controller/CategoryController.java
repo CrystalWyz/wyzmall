@@ -69,6 +69,17 @@ public class CategoryController {
     /**
      * 修改
      */
+    @RequestMapping("/update/menu")
+    //@RequiresPermissions("product:category:update")
+    public R updateMenu(@RequestBody List<CategoryEntity> categoryEntityList){
+        categoryService.updateBatchById(categoryEntityList);
+
+        return R.ok();
+    }
+
+    /**
+     * 修改
+     */
     @RequestMapping("/update")
     //@RequiresPermissions("product:category:update")
     public R update(@RequestBody CategoryEntity category){
