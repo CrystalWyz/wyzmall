@@ -5,8 +5,10 @@
       active-text="开启拖拽"
       inactive-text="关闭拖拽">
     </el-switch>
+    <el-button type="danger" round @click="batchDel">危险按钮</el-button>
     <el-tree :data="menus" :props="defaultProps" :expand-on-click-node="false" show-checkbox node-key="catId"
-             :default-expanded-keys="expandedKey" :draggable="draggable" @allow-drop="allowDrop" @node-drop="handleDrop">
+             :default-expanded-keys="expandedKey" :draggable="draggable" @allow-drop="allowDrop" @node-drop="handleDrop"
+             ref="menuTree">
     <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
         <span>
@@ -270,6 +272,31 @@ export default {
           this.updateChildNodeLevel(child.childNodes[i])
         }
       }
+    },
+
+    batchDel () {
+      this.$confirm(`是否删除选中的菜单?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        let catIds = this.$refs.menuTree.getCheckedNodes().map(e => e.catId)
+        this.$http({
+          url: this.$http.adornUrl('/product/category/delete'),
+          method: 'post',
+          data: this.$http.adornData(catIds, false)
+        }).then(() => {
+          this.$message({
+            message: '删除成功',
+            type: 'success'
+          })
+          // 刷新菜单
+          this.getMenu()
+          this.expandedKey = []
+        })
+      }).catch(() => {
+
+      })
     }
   },
   activated () {
