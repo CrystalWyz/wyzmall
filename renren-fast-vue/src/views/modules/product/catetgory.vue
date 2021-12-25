@@ -5,7 +5,7 @@
       active-text="开启拖拽"
       inactive-text="关闭拖拽">
     </el-switch>
-    <el-button type="danger" round @click="batchDel">危险按钮</el-button>
+    <el-button type="danger" round @click="batchDel">批量删除</el-button>
     <el-tree :data="menus" :props="defaultProps" :expand-on-click-node="false" show-checkbox node-key="catId"
              :default-expanded-keys="expandedKey" :draggable="draggable" @allow-drop="allowDrop" @node-drop="handleDrop"
              ref="menuTree">
