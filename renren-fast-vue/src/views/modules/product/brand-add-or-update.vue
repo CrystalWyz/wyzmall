@@ -8,7 +8,8 @@
       <el-input v-model="dataForm.name" placeholder="品牌名"></el-input>
     </el-form-item>
     <el-form-item label="logo" prop="logo">
-      <el-input v-model="dataForm.logo" placeholder="品牌logo地址"></el-input>
+<!--      <el-input v-model="dataForm.logo" placeholder="品牌logo地址"></el-input>-->
+      <SingleUpload v-model="dataForm.logo"/>
     </el-form-item>
     <el-form-item label="介绍" prop="descript">
       <el-input v-model="dataForm.descript" placeholder="介绍"></el-input>
@@ -35,7 +36,9 @@
 </template>
 
 <script>
+  import SingleUpload from '@/components/upload/singleUpload'
   export default {
+    components: {SingleUpload},
     data () {
       return {
         visible: false,
