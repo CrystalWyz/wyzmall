@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -39,9 +40,11 @@ public class OssController {
 
     @RequestMapping("/oss/policy")
     public R getPolicy() {
-        String host = "https://" + bucket + "." + endpoint; // host的格式为 bucketname.endpoint
+        // host的格式为 bucket-name.endpoint
+        String host = "https://" + bucket + "." + endpoint;
         // callbackUrl为上传回调服务器的URL，请将下面的IP和Port配置为您自己的真实信息。
-        String dir = LocalDate.now().toString() + "/"; // 用户上传文件时指定的前缀。
+        // 用户上传文件时指定的前缀。
+        String dir = LocalDate.now() + "/";
         Map<String, String> respMap = null;
         try {
             long expireTime = 30;
@@ -53,7 +56,7 @@ public class OssController {
             policyConds.addConditionItem(MatchMode.StartWith, PolicyConditions.COND_KEY, dir);
 
             String postPolicy = ossClient.generatePostPolicy(expiration, policyConds);
-            byte[] binaryData = postPolicy.getBytes("utf-8");
+            byte[] binaryData = postPolicy.getBytes(StandardCharsets.UTF_8);
             String encodedPolicy = BinaryUtil.toBase64String(binaryData);
             String postSignature = ossClient.calculatePostSignature(postPolicy);
 
@@ -64,9 +67,7 @@ public class OssController {
             respMap.put("dir", dir);
             respMap.put("host", host);
             respMap.put("expire", String.valueOf(expireEndTime / 1000));
-            // respMap.put("expire", formatISO8601Date(expiration));
         } catch (Exception e) {
-            // Assert.fail(e.getMessage());
             System.out.println(e.getMessage());
         } finally {
             ossClient.shutdown();
